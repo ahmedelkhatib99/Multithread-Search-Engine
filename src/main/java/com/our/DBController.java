@@ -5,6 +5,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 import org.bson.Document;
 
 import java.util.ArrayList;
@@ -35,11 +36,63 @@ public class DBController {
         pages = database.getCollection("pages");
     }
 
+    // Get number of documents in visitedLinks collection
+    public int getVisitedLinksCount() {
+        return (int) visitedLinks.countDocuments();
+    }
+
+    // Load initial seed
     public void loadInitSeed() {
         newLinks.drop();
         for (int i = 0; i <10; i++) {
-            Document seedEntry = new Document("seedURL", seedLinkList.get(i));
+            Document seedEntry = new Document("URL", seedLinkList.get(i));
             newLinks.insertOne(seedEntry);
         }
+    }
+
+    // Get new link
+    public String getNewLink() {
+        return newLinks.find().first().get("URL").toString();
+    }
+
+    // Remove a link from newLinks
+    public void removeFromNewLinks(String newLink) {
+        newLinks.deleteOne(Filters.eq("URL", newLink));
+    }
+
+    // Checks if a specific link exits in visitedLinks
+    public boolean visitedBefore(String newLink) {
+        return (visitedLinks.countDocuments(Filters.eq("URL", newLink)) != 0);
+    }
+
+    // Checks if a specific link exits in visitedLinks or in newLinks
+    public boolean isNewLink(String newLink) {
+        int countInVisitedLinks = (int) visitedLinks.countDocuments(Filters.eq("URL", newLink));
+        int countInNewLinks = (int) newLinks.countDocuments(Filters.eq("URL", newLink));
+        return ((countInVisitedLinks + countInNewLinks) == 0);
+    }
+
+    // Add a link to newLinks
+    public void addToNewLinks(String link) {
+        Document newLinkEntry = new Document("URL", link);
+        newLinks.insertOne(newLinkEntry);
+    }
+
+    // Add a link to visitedLinks
+    public void addToVisitedLinks(String link) {
+        Document visitedLinkEntry = new Document("URL", link);
+        visitedLinks.insertOne(visitedLinkEntry);
+    }
+
+    // Add a page to pages
+    public void addToPages(String URL, String pageContent) {
+        Document pageEntry = new Document("URL", URL);
+        pageEntry.append("pageContent", pageContent);
+        pages.insertOne(pageEntry);
+    }
+
+    // Check if a page exists in pages
+    public boolean pageSaved(String link) {
+        return (pages.countDocuments(Filters.eq("URL", link)) != 0);
     }
 }
