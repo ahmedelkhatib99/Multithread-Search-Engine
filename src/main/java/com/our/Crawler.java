@@ -87,8 +87,6 @@ class CrawlerThread implements Runnable {
                 }
                 // Extract links
                 ArrayList<String> extractedLinks = linkPage.getHyperlinks();
-                System.out.println("Links Extracted");
-                System.out.println(extractedLinks);
 
                     // For each extracted link
                 for (String extractedLink : extractedLinks) {
@@ -104,6 +102,10 @@ class CrawlerThread implements Runnable {
 
             // Remove link from newLinks
             DB.removeFromNewLinks(link);
+            System.out.println("Finished Processing");
+            System.out.println(link);
+            System.out.println(Thread.currentThread().getName());
+
             // Increment linkCounter
             linkCounter.increment();
         }

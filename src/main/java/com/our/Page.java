@@ -1,5 +1,6 @@
 package com.our;
 
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -17,14 +18,14 @@ public class Page {
     private final ArrayList<String> hyperlinkList = new ArrayList<>();
 
     public Page(String URL, Boolean Extract) throws IOException {
-        Document document = Jsoup.connect(URL).get();
+            Document document = Jsoup.connect(URL).get();
 
-        this.URL = URL;
+            this.URL = URL;
 
-        setPageTitle(document);
-        setPageText(document);
-        if (Extract)
-            setPageLinks(document);
+            setPageTitle(document);
+            setPageText(document);
+            if (Extract)
+                setPageLinks(document);
     }
 
     public ArrayList<String> getHyperlinks() {
@@ -75,6 +76,14 @@ public class Page {
             //Add each extracted URL
             for (Element linkEl : linksOnPage) {
                 String link = linkEl.attr("abs:href");
+
+                String[] linkStripped = link.split("[?#]");
+                if ((linkStripped[0].startsWith("http://") || linkStripped[0].startsWith("https://")) && (linkStripped[0].endsWith("/") || linkStripped[0].endsWith(".html")) && !(linkStripped[0].contains("linkedin") || linkStripped[0].contains("snapchat")))
+                    link = linkStripped[0];
+                else
+                    continue;
+
+                System.out.println(link);
 
                 //Check if in disallowed
                 try {
