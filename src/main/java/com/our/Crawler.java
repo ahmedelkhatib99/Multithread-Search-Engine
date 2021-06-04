@@ -1,5 +1,8 @@
 package com.our;
 
+import java.io.IOException;
+import java.util.ArrayList;
+
 public class Crawler {
     public static void main(String[] args) {
         // Create DBController
@@ -13,6 +16,12 @@ public class Crawler {
 
         // Create linkCounter
         Counter linkCounter = new Counter(DB);
+
+        Thread t1 = new Thread(new CrawlerThread(linkCounter, DB), "T1");
+        Thread t2 = new Thread(new CrawlerThread(linkCounter, DB), "T2");
+
+        t1.start();
+        t2.start();
     }
 }
 
@@ -49,46 +58,57 @@ class CrawlerThread implements Runnable {
 
     @Override
     public void run() {
-        crawl();
+        try {
+            crawl();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void crawl() {
-        while (true) {
-            // Finish condition
-            if (linkCounter.getCount() >= linkCounter.getMaxCount()) {
-                return;
-            }
+    public void crawl() throws IOException {
+        // Finish condition
+        if (linkCounter.getCount() >= linkCounter.getMaxCount()) {
+            return;
+        }
 
-            synchronized (linkCounter) {
-                // Get new link from newLinks
-                String link = DB.getNewLink();
+        synchronized (linkCounter) {
+            // Get new link from newLinks
+            String link = DB.getNewLink();
 
-                // If new link not visited before
-                if (!DB.visitedBefore(link)) {
-                    // Create page object
+            // If new link not visited before
+            if (!DB.visitedBefore(link)) {
+                // Create page object
+                Page linkPage = new Page(link, ((linkCounter.getCount() + DB.getNewLinksCount()) < linkCounter.getMaxCount()));
 
-                    // If link not in pages
-                    if (!DB.pageSaved(link)) {
-                        // Save page
-
-                    }
-                    // Extract links
+                // If link not in pages
+                if (!DB.pageSaved(link)) {
+                    // Save page
+                    linkPage.savePage(DB);
+                }
+                // Extract links
+                ArrayList<String> extractedLinks = linkPage.getHyperlinks();
 
                     // For each extracted link
-
-                        // If extractedLink is a new link
-                        // if (DB.isNewLink(extractedLink)) {
-                            // Add extracted link to newLinks
-                            // DB.addToNewLinks(extractedLink);
-                        // }
-                    // Add new link to visitedLinks
-                    DB.addToVisitedLinks(link);
+                for (String extractedLink : extractedLinks) {
+                    // If extractedLink is a new link
+                    if (DB.isNewLink(extractedLink)) {
+                        // Add extracted link to newLinks
+                        DB.addToNewLinks(extractedLink);
+                    }
                 }
-                // Remove link from newLinks
-                DB.removeFromNewLinks(link);
-                // Increment linkCounter
-                linkCounter.increment();
+                // Add new link to visitedLinks
+                DB.addToVisitedLinks(link);
             }
+
+            // Remove link from newLinks
+            DB.removeFromNewLinks(link);
+            System.out.println("Finished Processing");
+            System.out.println(link);
+            System.out.println(Thread.currentThread().getName());
+
+            // Increment linkCounter
+            linkCounter.increment();
         }
+        crawl();
     }
 }

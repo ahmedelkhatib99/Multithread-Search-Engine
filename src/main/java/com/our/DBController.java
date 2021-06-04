@@ -22,7 +22,7 @@ public class DBController {
     private final MongoCollection<Document> visitedLinks;
     private final MongoCollection<Document> pages;
 
-    private static final ArrayList<String> seedLinkList = new ArrayList<String>(Arrays.asList("https://www.wikipedia.org/", "https://www.nytimes.com/","https://www.theguardian.com/","https://www.bbc.com/","https://www.espn.com/","https://www.amazon.com/","https://egypt.souq.com/","https://www.gutenberg.org/","https://www.tutorialspoint.com/","https://stackoverflow.com/"));
+    private static final ArrayList<String> seedLinkList = new ArrayList<String>(Arrays.asList("https://www.nytimes.com/", "https://www.theguardian.com/", "https://www.bbc.com/", "https://www.espn.com/", "https://www.amazon.com/", "https://egypt.souq.com/", "https://www.gutenberg.org/", "https://www.tutorialspoint.com/", "https://stackoverflow.com/", "https://en.wikipedia.org/"));
 
     public DBController() {
         Logger mongoLogger = Logger.getLogger( "org.mongodb" );
@@ -39,6 +39,11 @@ public class DBController {
     // Get number of documents in visitedLinks collection
     public int getVisitedLinksCount() {
         return (int) visitedLinks.countDocuments();
+    }
+
+    // Get number of documents in newLinks collection
+    public int getNewLinksCount() {
+        return (int) newLinks.countDocuments();
     }
 
     // Load initial seed
@@ -85,9 +90,10 @@ public class DBController {
     }
 
     // Add a page to pages
-    public void addToPages(String URL, String pageContent) {
+    public void addToPages(String URL, String pageTitle, String pageText) {
         Document pageEntry = new Document("URL", URL);
-        pageEntry.append("pageContent", pageContent);
+        pageEntry.append("pageTitle", pageTitle);
+        pageEntry.append("pageText", pageText);
         pages.insertOne(pageEntry);
     }
 
