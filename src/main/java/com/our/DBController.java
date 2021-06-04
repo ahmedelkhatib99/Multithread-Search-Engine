@@ -1,13 +1,11 @@
 package com.our;
 
 import com.mongodb.*;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -21,6 +19,7 @@ public class DBController {
     private final MongoCollection<Document> newLinks;
     private final MongoCollection<Document> visitedLinks;
     private final MongoCollection<Document> pages;
+    private final MongoCollection<Document> indexer;
 
     private static final ArrayList<String> seedLinkList = new ArrayList<String>(Arrays.asList("https://www.nytimes.com/", "https://www.theguardian.com/", "https://www.bbc.com/", "https://www.espn.com/", "https://www.amazon.com/", "https://egypt.souq.com/", "https://www.gutenberg.org/", "https://www.tutorialspoint.com/", "https://stackoverflow.com/", "https://en.wikipedia.org/"));
 
@@ -34,6 +33,7 @@ public class DBController {
         newLinks = database.getCollection("newLinks");
         visitedLinks = database.getCollection("visitedLinks");
         pages = database.getCollection("pages");
+        indexer = database.getCollection("indexer");
     }
 
     // Get number of documents in visitedLinks collection
@@ -100,5 +100,74 @@ public class DBController {
     // Check if a page exists in pages
     public boolean pageSaved(String link) {
         return (pages.countDocuments(Filters.eq("URL", link)) != 0);
+    }
+
+    // Get pages function
+    public FindIterable<Document> getPages() {
+        return pages.find();
+    }
+
+    // Check if word exists in indexer
+    public boolean wordExists(String word) {
+        return !(indexer.countDocuments(Filters.eq("word", word)) == 0);
+    }
+
+    // Add new word to indexer
+    public void addWordToIndexer(String word, String URL, int TF, float IDF) {
+        Document indexerEntry = new Document("word", word);
+        ArrayList<Document> URLList =  new ArrayList<>();
+        Document URLEntry = new Document("URL", URL);
+        URLEntry.append("TF", TF);
+        URLList.add(URLEntry);
+        indexerEntry.append("URLList", URLList);
+        indexerEntry.append("IDF", IDF);
+        indexer.insertOne(indexerEntry);
+    }
+
+    // Get URLList of a word
+    public ArrayList<Document> getURLList(String word) {
+        return (ArrayList<Document>) indexer.find(Filters.eq("word", word)).first().get("URLList");
+    }
+
+    // Update URLList of a word in indexer
+    public void updateURLList(String word, ArrayList<Document> URLList) {
+        // Create query
+        BasicDBObject query = new BasicDBObject();
+        query.put("word", word);
+
+        // Create new document
+        BasicDBObject newDocument = new BasicDBObject();
+        newDocument.put("URLList", URLList);
+
+        // Create update object
+        BasicDBObject updateObject = new BasicDBObject();
+        updateObject.put("$set", newDocument);
+
+        // Update document
+        indexer.updateOne(query, updateObject);
+    }
+
+    // Update URLList and IDF of a word in indexer
+    public void updateURLListAndIDF(String word, ArrayList<Document> URLList, float IDF) {
+        // Create query
+        BasicDBObject query = new BasicDBObject();
+        query.put("word", word);
+
+        // Create new document
+        BasicDBObject newDocument = new BasicDBObject();
+        newDocument.put("URLList", URLList);
+        newDocument.put("IDF", IDF);
+
+        // Create update object
+        BasicDBObject updateObject = new BasicDBObject();
+        updateObject.put("$set", newDocument);
+
+        // Update document
+        indexer.updateOne(query, updateObject);
+    }
+
+    // Drop indexer collection
+    public void dropIndexerCollection() {
+        indexer.drop();
     }
 }
