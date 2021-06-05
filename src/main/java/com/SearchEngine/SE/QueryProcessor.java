@@ -7,7 +7,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public class QueryProcessor {
-    public static void main(String[] args) throws FileNotFoundException {
+
+    public static ArrayList<Document> getSearchResults(String queryString, int page, int limit) throws FileNotFoundException {
         // Initialize DBController
         DBController DB = new DBController();
 
@@ -15,18 +16,12 @@ public class QueryProcessor {
         ArrayList<String> stopwords = new ArrayList<>();
         Stopwords.loadStopwords(stopwords);
 
-        // Test String
-        String queryString = "york time, the    video  ? story";
-
         // Process queryString
         ArrayList<String> queryWords = processQueryText(queryString, stopwords);
 
         // Get queryURLList
         ArrayList<String> queryURLList = getQueryURLList(queryWords, DB);
 
-        // Paginate and populate queryURLList
-        int page = 1;
-        int limit = 3;
         ArrayList<Document> resultsList = paginateAndPopulate(queryURLList, page, limit, DB);
 
         // Replace text with snippets
@@ -42,9 +37,8 @@ public class QueryProcessor {
             }
         }
 
-
         // Test add to history
-        DB.addToHistory("A long query");
+        DB.addToHistory(queryString);
 
         // Test get suggestions
         String searchQuery = "tHis";
@@ -53,6 +47,7 @@ public class QueryProcessor {
             System.out.println(suggestion.get("query"));
         }
 
+        return resultsList;
     }
 
     private static ArrayList<String> processQueryText(String queryString, ArrayList<String> stopwords) {
