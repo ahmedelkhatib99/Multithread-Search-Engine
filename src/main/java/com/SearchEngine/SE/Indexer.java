@@ -1,15 +1,10 @@
-package com.our;
+package com.SearchEngine.SE;
 
 import com.mongodb.client.FindIterable;
+import opennlp.tools.stemmer.PorterStemmer;
 import org.bson.Document;
 
-import java.io.File;  // Import the File class
-import java.io.FileNotFoundException;  // Import this class to handle errors
-import java.lang.reflect.Array;
-import java.util.Scanner; // Import the Scanner class to read text files
-
-import opennlp.tools.stemmer.PorterStemmer;
-
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public class Indexer {

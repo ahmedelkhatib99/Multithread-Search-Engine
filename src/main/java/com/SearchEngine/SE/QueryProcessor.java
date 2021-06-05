@@ -1,4 +1,4 @@
-package com.our;
+package com.SearchEngine.SE;
 import com.mongodb.client.FindIterable;
 import opennlp.tools.stemmer.PorterStemmer;
 import org.bson.Document;
