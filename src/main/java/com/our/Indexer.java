@@ -22,7 +22,7 @@ public class Indexer {
 
         // Read stopwords
         ArrayList<String> stopwords = new ArrayList<>();
-        loadStopwords(stopwords);
+        Stopwords.loadStopwords(stopwords);
 
         // Create PortStemmer
         PorterStemmer porterStemmer = new PorterStemmer();
@@ -95,13 +95,5 @@ public class Indexer {
             }
         }
         return array;
-    }
-
-    private static void loadStopwords(ArrayList<String> stopwords) throws FileNotFoundException {
-        File fileObj = new File("stopwords.txt");
-        Scanner myReader = new Scanner(fileObj);
-        while (myReader.hasNextLine()) {
-            stopwords.add(myReader.nextLine().toLowerCase());
-        }
     }
 }

@@ -182,4 +182,14 @@ public class DBController {
     public void dropIndexerCollection() {
         indexer.drop();
     }
+	
+	// Search for a word in indexer
+    public ArrayList<Document> searchWord(String word) {
+        return indexer.find(Filters.eq("word", word)).into(new ArrayList<Document>());
+    }
+
+    // Get page with url
+    public Document getPage(String URL) {
+        return (Document) pages.find(Filters.eq("URL", URL)).first();
+    }
 }
