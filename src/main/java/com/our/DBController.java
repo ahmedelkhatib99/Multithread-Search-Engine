@@ -4,18 +4,13 @@ import com.mongodb.*;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
-import com.mongodb.client.result.UpdateResult;
-import org.bson.BsonDocument;
+import com.mongodb.client.model.UpdateOptions;
 import org.bson.Document;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-
-import java.net.UnknownHostException;
 
 public class DBController {
 
@@ -23,6 +18,7 @@ public class DBController {
     private final MongoCollection<Document> visitedLinks;
     private final MongoCollection<Document> pages;
     private final MongoCollection<Document> indexer;
+    private final MongoCollection<Document> history;
 
     private static final ArrayList<String> seedLinkList = new ArrayList<String>(Arrays.asList("https://www.nytimes.com/", "https://www.theguardian.com/", "https://www.bbc.com/", "https://www.espn.com/", "https://www.amazon.com/", "https://egypt.souq.com/", "https://www.gutenberg.org/", "https://www.tutorialspoint.com/", "https://stackoverflow.com/", "https://en.wikipedia.org/"));
 
@@ -37,6 +33,7 @@ public class DBController {
         visitedLinks = database.getCollection("visitedLinks");
         pages = database.getCollection("pages");
         indexer = database.getCollection("indexer");
+        history = database.getCollection("history");
     }
 
     // Get number of documents in visitedLinks collection
@@ -191,5 +188,15 @@ public class DBController {
     // Get page with url
     public Document getPage(String URL) {
         return (Document) pages.find(Filters.eq("URL", URL)).first();
+    }
+
+    // Add a query to history
+    public void addToHistory(String query) {
+        history.updateOne(Filters.eq("query", query), Updates.inc("frequency", 1), new UpdateOptions().upsert(true));
+    }
+
+    // Get suggestions
+    public FindIterable<Document> getSuggestions(String query) {
+        return history.find(Filters.regex("query", "^"+query, "i"));
     }
 }

@@ -1,8 +1,8 @@
 package com.our;
+import com.mongodb.client.FindIterable;
 import opennlp.tools.stemmer.PorterStemmer;
 import org.bson.Document;
 
-import javax.print.Doc;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
@@ -41,6 +41,18 @@ public class QueryProcessor {
                 System.out.println(doc.get("pageText"));
             }
         }
+
+
+        // Test add to history
+        DB.addToHistory("A long query");
+
+        // Test get suggestions
+        String searchQuery = "tHis";
+        FindIterable<Document> suggestions = DB.getSuggestions(searchQuery);
+        for (Document suggestion : suggestions) {
+            System.out.println(suggestion.get("query"));
+        }
+
     }
 
     private static ArrayList<String> processQueryText(String queryString, ArrayList<String> stopwords) {
