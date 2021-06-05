@@ -3,6 +3,9 @@ package com.our;
 import com.mongodb.*;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.UpdateResult;
+import org.bson.BsonDocument;
 import org.bson.Document;
 
 import java.lang.reflect.Array;
@@ -51,13 +54,21 @@ public class DBController {
         newLinks.drop();
         for (int i = 0; i <10; i++) {
             Document seedEntry = new Document("URL", seedLinkList.get(i));
+            seedEntry.append("processing", false);
             newLinks.insertOne(seedEntry);
         }
     }
 
-    // Get new link
-    public String getNewLink() {
-        return newLinks.find().first().get("URL").toString();
+    // Get new non processing link
+    public String getNewUnprocessedLink() {
+        Document newLink = newLinks.find(Filters.eq("processing", false)).first();
+        newLinks.findOneAndUpdate(Filters.eq("_id",newLink.get("_id")), Updates.set("processing", true));
+        return newLink.get("URL").toString();
+    }
+
+    // Reset All Processing Links
+    public void resetProcessingLink() {
+        newLinks.updateMany(Filters.eq("processing", true), Updates.set("processing", false));
     }
 
     // Remove a link from newLinks
@@ -80,6 +91,7 @@ public class DBController {
     // Add a link to newLinks
     public void addToNewLinks(String link) {
         Document newLinkEntry = new Document("URL", link);
+        newLinkEntry.append("processing", false);
         newLinks.insertOne(newLinkEntry);
     }
 
