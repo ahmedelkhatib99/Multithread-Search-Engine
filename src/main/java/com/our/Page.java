@@ -12,20 +12,39 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 public class Page {
-    private final String URL;
+    private String URL;
     private String Title;
     private String Text;
     private final ArrayList<String> hyperlinkList = new ArrayList<>();
 
-    public Page(String URL, Boolean Extract) throws IOException {
-            Document document = Jsoup.connect(URL).get();
+    public Page(String URL, Boolean Extract, DBController DB, Counter linkCounter) {
+        try {
 
             this.URL = URL;
 
+            // Fetch Document Data from the internet
+            Document document = Jsoup.connect(URL).get();
+
             setPageTitle(document);
             setPageText(document);
+
+            // If still below 5000 extract all links
             if (Extract)
                 setPageLinks(document);
+
+        } catch (HttpStatusException e) {
+
+            //HTTP Error: Log, Decrement and Remove
+            System.err.println("Error: " + e.toString() + " Caught in URL: " + URL);
+            System.err.println("Error: Removing Link");
+
+            linkCounter.decrement();
+
+            DB.removeFromNewLinks(URL);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public ArrayList<String> getHyperlinks() {
@@ -46,14 +65,33 @@ public class Page {
         Text = document.text();
     }
 
+    public String getHost(String link){
+        int count = 0;
+        for (int i=0 ; i<link.length() ; i++) {
+            count = (link.charAt(i) == '/')? count + 1 : count;
+            if(count == 3){
+                return link.substring(0,i);
+            }
+        }
+        return link;
+    }
+    public String getPath(String link){
+        int count = 0;
+        for (int i=0 ; i<link.length() ; i++) {
+            count = (link.charAt(i) == '/')? count + 1 : count;
+            if(count == 3){
+                return link.substring(i);
+            }
+        }
+        return "";
+    }
+
     private void setPageLinks(Document document) {
-            System.out.println("Extracting Links from: " + URL);
 
             Vector<String> arrOfDisallows = new Vector<>();
 
             try {
-                java.net.URL url = new URL(URL);
-                String robotURL = url.getProtocol() + "://" + url.getHost() + "/robots.txt";
+                String robotURL = getHost(URL) + getPath(URL) + "/robots.txt";
                 Document robot = Jsoup.connect(robotURL).get();
                 String[] arrOfStr = robot.text().split(" ");
                 boolean userAgent = false;
@@ -82,8 +120,6 @@ public class Page {
                     link = linkStripped[0];
                 else
                     continue;
-
-                System.out.println(link);
 
                 //Check if in disallowed
                 try {
