@@ -118,19 +118,19 @@ class CrawlerThread implements Runnable {
             }
             // Add new link to visitedLinks
             DB.addToVisitedLinks(link);
+            System.out.println("End Transmission at Thread " + Thread.currentThread().getName());
 
             // Start CS: Increment counter
             synchronized (linkCounter) {
                 linkCounter.increment();
+                System.out.println("END THREAD "+ Thread.currentThread().getName() + " at count " + linkCounter.getCount());
             }
             // End CS
 
-            System.out.println("End Transmission at Thread " + Thread.currentThread().getName());
         }
 
         // Remove link from newLinks
         DB.removeFromNewLinks(link);
-        System.out.println("END THREAD " + linkCounter.getCount());
 
         // Increment linkCounter
 
