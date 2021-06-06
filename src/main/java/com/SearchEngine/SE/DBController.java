@@ -9,6 +9,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class DBController {
     private final MongoCollection<Document> indexer;
     private final MongoCollection<Document> history;
 
-    private static final ArrayList<String> seedLinkList = new ArrayList<String>(Arrays.asList("https://www.nytimes.com/", "https://www.theguardian.com/", "https://www.bbc.com/", "https://www.espn.com/", "https://www.amazon.com/", "https://egypt.souq.com/", "https://www.gutenberg.org/", "https://www.tutorialspoint.com/", "https://stackoverflow.com/", "https://en.wikipedia.org/"));
+    private static final ArrayList<String> seedLinkList = new ArrayList<>(Arrays.asList("https://www.nytimes.com/", "https://www.theguardian.com/", "https://www.bbc.com/", "https://www.espn.com/", "https://www.amazon.com/", "https://egypt.souq.com/", "https://www.gutenberg.org/", "https://www.tutorialspoint.com/", "https://stackoverflow.com/", "https://en.wikipedia.org/"));
 
     public DBController() {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
@@ -62,9 +63,13 @@ public class DBController {
 
     // Get new non processing link
     public String getNewUnprocessedLink() {
-        Document newLink = newLinks.find(Filters.eq("processing", false)).first();
-        newLinks.findOneAndUpdate(Filters.eq("_id",newLink.get("_id")), Updates.set("processing", true));
-        return newLink.get("URL").toString();
+        Bson filter = Filters.eq("processing", false);
+        Bson update = Updates.set("processing", true);
+        Document newUnprocessedLink =  newLinks.findOneAndUpdate(filter, update);
+        if(newUnprocessedLink == null) {
+            return null;
+        }
+        return (String) newUnprocessedLink.get("URL");
     }
 
     // Reset All Processing Links
@@ -91,9 +96,9 @@ public class DBController {
 
     // Add a link to newLinks
     public void addToNewLinks(String link) {
-        Document newLinkEntry = new Document("URL", link);
-        newLinkEntry.append("processing", false);
-        newLinks.insertOne(newLinkEntry);
+        Bson filter = Filters.eq("URL", link);
+        Bson update = Updates.set("processing", false);
+        newLinks.updateOne(filter, update, new UpdateOptions().upsert(true));
     }
 
     // Add a link to visitedLinks
@@ -186,17 +191,19 @@ public class DBController {
 	
 	// Search for a word in indexer
     public ArrayList<Document> searchWord(String word) {
-        return indexer.find(Filters.eq("word", word)).into(new ArrayList<Document>());
+        return indexer.find(Filters.eq("word", word)).into(new ArrayList<>());
     }
 
     // Get page with url
     public Document getPage(String URL) {
-        return (Document) pages.find(Filters.eq("URL", URL)).first();
+        return pages.find(Filters.eq("URL", URL)).first();
     }
 
     // Add a query to history
     public void addToHistory(String query) {
-        history.updateOne(Filters.eq("query", query), Updates.inc("frequency", 1), new UpdateOptions().upsert(true));
+        Bson filter = Filters.eq("query", query);
+        Bson update = Updates.inc("frequency", 1);
+        history.updateOne(filter, update, new UpdateOptions().upsert(true));
     }
 
     // Get suggestions
