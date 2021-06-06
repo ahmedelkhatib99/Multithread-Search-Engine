@@ -1,16 +1,19 @@
 package com.SearchEngine.SE;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import org.bson.Document;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 public class DBController {
 
@@ -23,8 +26,9 @@ public class DBController {
     private static final ArrayList<String> seedLinkList = new ArrayList<String>(Arrays.asList("https://www.nytimes.com/", "https://www.theguardian.com/", "https://www.bbc.com/", "https://www.espn.com/", "https://www.amazon.com/", "https://egypt.souq.com/", "https://www.gutenberg.org/", "https://www.tutorialspoint.com/", "https://stackoverflow.com/", "https://en.wikipedia.org/"));
 
     public DBController() {
-        Logger mongoLogger = Logger.getLogger( "org.mongodb" );
-        mongoLogger.setLevel(Level.SEVERE);
+        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        Logger rootLogger = loggerContext.getLogger("org.mongodb.driver");
+        rootLogger.setLevel(Level.OFF);
 
         MongoClient client = MongoClients.create("mongodb+srv://Admin:vl2Ae3opUkQUf0dX@cluster0.lolxd.mongodb.net");
         MongoDatabase database = client.getDatabase("SearchEngineDB");
