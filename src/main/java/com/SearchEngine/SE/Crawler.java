@@ -79,61 +79,62 @@ class CrawlerThread implements Runnable {
     }
 
     public void crawl() throws IOException {
-        // Finish condition
-        if (linkCounter.getCount() >= linkCounter.getMaxCount()) {
-            return;
-        }
-
         String link;
-
-        // Start CS: Fetch a link and set it to processing
-        synchronized (linkCounter) {
-            // Get new link from newLinks
-            link = DB.getNewUnprocessedLink();
-        }
-        // End CS
-
-        // If new unprocessed link not visited before
-        if (!DB.visitedBefore(link)) {
-            // Create page object
-            Page linkPage = new Page(link, ((linkCounter.getCount() + DB.getNewLinksCount()) < linkCounter.getMaxCount()), DB, linkCounter);
-
-            // If link not in pages
-            if (!DB.pageSaved(link)) {
-                // Save page
-                linkPage.savePage(DB);
+        try {
+            // Finish condition
+            if (linkCounter.getCount() >= linkCounter.getMaxCount()) {
+                return;
             }
-            // Extract links
-            ArrayList<String> extractedLinks = linkPage.getHyperlinks();
 
-            System.out.println("Start Transmission at Thread " + Thread.currentThread().getName() + " and extracting Links from: " + link);
+            // Get a new unprocessed link
+            link = DB.getNewUnprocessedLink();
 
-                // For each extracted link
-            for (String extractedLink : extractedLinks) {
-                // If extractedLink is a new link
-                if (DB.isNewLink(extractedLink)) {
-                    // Add extracted link to newLinks
-                    DB.addToNewLinks(extractedLink);
+            if (link != null) {
+                // If new unprocessed link not visited before
+                if (!DB.visitedBefore(link)) {
+                    // Create page object
+                    Page linkPage = new Page(link, ((linkCounter.getCount() + DB.getNewLinksCount()) < linkCounter.getMaxCount()), DB, linkCounter);
+
+                    if (linkPage.getTitle() != null) {
+                        // If link not in pages
+                        if (!DB.pageSaved(link)) {
+                            // Save page
+                            linkPage.savePage(DB);
+                            // Start CS: Increment counter
+                            synchronized (linkCounter) {
+                                linkCounter.increment();
+                            }
+                            // End CS
+                        }
+                        // Extract links
+                        ArrayList<String> extractedLinks = linkPage.getHyperlinks();
+
+                        System.out.println("Start Transmission at Thread " + Thread.currentThread().getName() + " and extracting Links from: " + link);
+
+                        // For each extracted link
+                        for (String extractedLink : extractedLinks) {
+                            // If extractedLink is a new link
+                            if (DB.isNewLink(extractedLink)) {
+                                // Add extracted link to newLinks
+                                DB.addToNewLinks(extractedLink);
+                            }
+                        }
+                    }
+                    // Add new link to visitedLinks
+                    DB.addToVisitedLinks(link);
+                    System.out.println("End Transmission at Thread " + Thread.currentThread().getName());
+
+
+                    System.out.println("END THREAD " + Thread.currentThread().getName() + " at count " + linkCounter.getCount());
                 }
             }
-            // Add new link to visitedLinks
-            DB.addToVisitedLinks(link);
-            System.out.println("End Transmission at Thread " + Thread.currentThread().getName());
 
-            // Start CS: Increment counter
-            synchronized (linkCounter) {
-                linkCounter.increment();
-                System.out.println("END THREAD "+ Thread.currentThread().getName() + " at count " + linkCounter.getCount());
-            }
-            // End CS
+            // Remove link from newLinks
+            DB.removeFromNewLinks(link);
 
+            crawl();
+        } catch (Exception e) {
+            crawl();
         }
-
-        // Remove link from newLinks
-        DB.removeFromNewLinks(link);
-
-        // Increment linkCounter
-
-        crawl();
     }
 }

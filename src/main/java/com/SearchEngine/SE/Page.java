@@ -38,13 +38,13 @@ public class Page {
             System.err.println("Error: " + e.toString() + " Caught in URL: " + URL);
             System.err.println("Error: Removing Link");
 
-            linkCounter.decrement();
-
-            DB.removeFromNewLinks(URL);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getTitle() {
+        return this.Title;
     }
 
     public ArrayList<String> getHyperlinks() {
