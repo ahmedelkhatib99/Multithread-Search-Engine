@@ -14,24 +14,38 @@ function MainPage() {
   const [query, setQuery] = useState([]);
   const history = useHistory();
 
-  // useEffect(() => {
-  //   Axios({
-  //     method: 'get',
-  //     url: `${process.env.REACT_APP_API_URL}/api/v1/submission/${props.match.params.assId}`,
-  //     headers: {
-  //       authorization: token,
-  //     },
-  //   })
-  //     .then((res) => {
-  //       history.push('/assignments');
-  //     })
-  //     .catch((err) => {
-  //       //console.log(err);
-  //     });
-  // }, []);
+  function GetSortOrder(prop) {
+    return function (a, b) {
+      if (a[prop] < b[prop]) {
+        return 1;
+      } else if (a[prop] > b[prop]) {
+        return -1;
+      }
+      return 0;
+    };
+  }
+
+  useEffect(() => {
+    console.log(query);
+    setSuggestions([]);
+    if (query && query.length >= 2) {
+      Axios({
+        method: 'get',
+        url: `http://localhost:8080/api/suggest?query=${query}`,
+      })
+        .then((res) => {
+          console.log(res.data);
+          setSuggestions(res.data.sort(GetSortOrder('frequency')).slice(0, 9));
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [query]);
 
   const _handleKeyDown = (e) => {
     setQuery(e.target.value);
+    console.log(e.target.value);
   };
 
   return (
@@ -44,6 +58,7 @@ function MainPage() {
               history.push({
                 pathname: `/search/${query}`,
               });
+              window.location.reload();
             }}
           >
             <div className='d-flex flex-column justify-content-center vh-100'>
@@ -71,7 +86,8 @@ function MainPage() {
                   <i className='fa fa-search search-icn'></i>
                   <div className='suggest-list'>
                     {suggestions.map((suggest) => {
-                      return <Suggestion query={suggest.query} />;
+                      console.log(suggest.searchQueryText);
+                      return <Suggestion query={suggest.searchQueryText} />;
                     })}
                   </div>
                 </div>

@@ -16,8 +16,20 @@ function ResultPage(props) {
   const [results, setResults] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
 
+  function GetSortOrder(prop) {
+    return function (a, b) {
+      if (a[prop] < b[prop]) {
+        return 1;
+      } else if (a[prop] > b[prop]) {
+        return -1;
+      }
+      return 0;
+    };
+  }
+
   useEffect(() => {
     setQuery(props.match.params.query);
+    setSuggestions([]);
     axios({
       method: 'get',
       url: `http://localhost:8080/api/search?query=${props.match.params.query}`,
@@ -33,6 +45,20 @@ function ResultPage(props) {
 
   const _handleKeyDown = (e) => {
     setQuery(e.target.value);
+    setSuggestions([]);
+    if (query && query.length >= 2) {
+      axios({
+        method: 'get',
+        url: `http://localhost:8080/api/suggest?query=${query}`,
+      })
+        .then((res) => {
+          console.log(res.data);
+          setSuggestions(res.data.sort(GetSortOrder('frequency')).slice(0, 9));
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   };
 
   return (
@@ -72,7 +98,7 @@ function ResultPage(props) {
               <i className='fa fa-search search-icn'></i>
               <div className='suggest-list'>
                 {suggestions.map((suggest) => {
-                  return <Suggestion query={suggest.query} />;
+                  return <Suggestion query={suggest.searchQueryText} />;
                 })}
               </div>
             </div>

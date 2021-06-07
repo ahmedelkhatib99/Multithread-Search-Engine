@@ -12,6 +12,9 @@ public class QueryProcessor {
         // Initialize DBController
         DBController DB = new DBController();
 
+        // Test add to history
+        DB.addToHistory(queryString);
+
         // Read stopwords
         ArrayList<String> stopwords = new ArrayList<>();
         Stopwords.loadStopwords(stopwords);
@@ -36,11 +39,6 @@ public class QueryProcessor {
                 System.out.println(doc.get("pageText"));
             }
         }
-
-        // Test add to history
-        DB.addToHistory(queryString);
-
-
 
         return resultsList;
     }
