@@ -2,13 +2,24 @@ package com.SearchEngine.SE;
 import com.mongodb.client.FindIterable;
 import opennlp.tools.stemmer.PorterStemmer;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public class QueryProcessor {
+    public static void main(String[] args) throws FileNotFoundException {
+        Document searchResult = getSearchResults("jump navigate", 1, 1);
+        ArrayList<Document> list = (ArrayList<Document>) searchResult.get("list");
+        System.out.println("Count: " + searchResult.get("count"));
+        if (list != null) {
+            for (Document doc : list) {
+                System.out.println(doc.get("pageText"));
+            }
+        }
+    }
 
-    public static ArrayList<Document> getSearchResults(String queryString, int page, int limit) throws FileNotFoundException {
+    public static Document getSearchResults(String queryString, int page, int limit) throws FileNotFoundException {
         // Initialize DBController
         DBController DB = new DBController();
 
@@ -25,10 +36,13 @@ public class QueryProcessor {
         // Get queryURLList
         ArrayList<String> queryURLList = getQueryURLList(queryWords, DB);
 
+        // Paginate and Populate queryURLList
         ArrayList<Document> resultsList = paginateAndPopulate(queryURLList, page, limit, DB);
 
         // Replace text with snippets
-        resultsList = textToSnippets(resultsList, queryString, stopwords, 10);
+        if (resultsList != null) {
+            resultsList = textToSnippets(resultsList, queryString, stopwords, 10);
+        }
 
         for (String URL : queryURLList) {
             System.out.println(URL);
@@ -40,7 +54,10 @@ public class QueryProcessor {
             }
         }
 
-        return resultsList;
+        Document searchResult = new Document("list", resultsList);
+        searchResult.append("count", queryURLList.size());
+
+        return searchResult;
     }
 
     public static ArrayList<Document> getSuggestions(String searchQuery)
