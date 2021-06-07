@@ -40,14 +40,22 @@ public class QueryProcessor {
         // Test add to history
         DB.addToHistory(queryString);
 
-        // Test get suggestions
-        String searchQuery = "tHis";
-        FindIterable<Document> suggestions = DB.getSuggestions(searchQuery);
-        for (Document suggestion : suggestions) {
-            System.out.println(suggestion.get("query"));
-        }
+
 
         return resultsList;
+    }
+
+    public static ArrayList<Document> getSuggestions(String searchQuery)
+    {
+        DBController DB = new DBController();
+        FindIterable<Document> suggestions = DB.getSuggestions(searchQuery);
+        ArrayList<Document> SuggestionList = new ArrayList<>();
+        for (Document suggestion : suggestions) {
+            Document SuggestionItem = new Document("query", suggestion.get("query").toString());
+            SuggestionItem.append("frequency", suggestion.get("frequency").toString());
+            SuggestionList.add(SuggestionItem);
+        }
+        return SuggestionList;
     }
 
     private static ArrayList<String> processQueryText(String queryString, ArrayList<String> stopwords) {
