@@ -13,16 +13,20 @@ public class SearchController {
     @CrossOrigin
     @GetMapping("/api/search")
     @ResponseBody
-    public ArrayList<SearchResult> searchDB(@RequestParam("query") String query, @RequestParam(value = "page", required = true, defaultValue = "1") int page) throws FileNotFoundException {
-        ArrayList<SearchResult> resList = new ArrayList<SearchResult>();
+    public SearchResult searchDB(@RequestParam("query") String query, @RequestParam(value = "page", required = true, defaultValue = "1") int page) throws FileNotFoundException {
+        ArrayList<SearchResult.pageItem> resList = new ArrayList<SearchResult.pageItem>();
 
-        ArrayList<Document> docList = QueryProcessor.getSearchResults(query,page,20);
+        Document doc = QueryProcessor.getSearchResults(query,page,20);
+        ArrayList<Document> docList = (ArrayList<Document>) doc.get("list");
+        String docCount = doc.get("count").toString();
 
-        for (Document doc: docList){
-            resList.add(new SearchResult(doc.get("pageTitle").toString(), doc.get("URL").toString(), doc.get("pageText").toString()));
+        for (Document docItem: docList){
+            resList.add(new SearchResult.pageItem(docItem.get("pageTitle").toString(), docItem.get("URL").toString(), docItem.get("pageText").toString()));
         }
 
-        return resList;
+        SearchResult res = new SearchResult(resList, docCount);
+
+        return res;
     }
 
     @CrossOrigin
