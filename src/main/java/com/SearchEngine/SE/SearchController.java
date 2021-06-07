@@ -24,4 +24,19 @@ public class SearchController {
 
         return resList;
     }
+
+    @CrossOrigin
+    @GetMapping("/api/suggest")
+    @ResponseBody
+    public ArrayList<Suggestion> getSuggestionsDB(@RequestParam("query") String query) {
+        ArrayList<Suggestion> suggestionList = new ArrayList<Suggestion>();
+
+        ArrayList<Document> docList = QueryProcessor.getSuggestions(query);
+
+        for (Document doc: docList){
+            suggestionList.add(new Suggestion(doc.get("query").toString(), doc.get("frequency").toString()));
+        }
+
+        return suggestionList;
+    }
 }

@@ -1,0 +1,33 @@
+.search-bar {
+  height: 3rem;
+  font-size: 1.7rem;
+  padding: 0.25rem 0.25rem;
+  border: solid;
+  border-width: thin;
+  border-color: #a7a7a7;
+  border-radius: 0.25rem;
+}
+
+.suggest-list {
+  background-color: rgb(112, 112, 112);
+  width: 100%;
+  position: absolute;
+  top: 3rem;
+  z-index: 99;
+}
+
+.suggest-item {
+  height: 2.3rem;
+  background-color: #ffffff;
+  border: solid;
+  border-width: 0px 1px 1px 1px;
+  border-color: #cdcdcd;
+  padding: 0.2rem;
+}
+
+.fa.fa-search.search-icn {
+  font-size: 1.8rem;
+  position: absolute;
+  right: 1rem;
+  color: #919191;
+}
