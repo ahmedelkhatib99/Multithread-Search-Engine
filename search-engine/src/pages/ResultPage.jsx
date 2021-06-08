@@ -2,7 +2,7 @@ import React, { Component, useEffect, useState } from 'react';
 import Result from '../components/Result';
 import Suggestion from '../components/Suggestion';
 import Pagination from '../components/Pagination';
-import logo from '../assets/img/Asset 1.svg';
+import logo from '../assets/img/Asset 41.svg';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 
@@ -21,6 +21,7 @@ function ResultPage(props) {
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const pageCount = 20;
+  let queryLast;
 
   function GetSortOrder(prop) {
     return function (a, b) {
@@ -71,7 +72,7 @@ function ResultPage(props) {
 
   useEffect(() => {
     setSuggestions([]);
-    if (query && query.length >= 2) {
+    if (query && query.length >= 2 && query !== props.match.params.query) {
       axios({
         method: 'get',
         url: `http://localhost:8080/api/suggest?query=${query}`,
@@ -151,7 +152,22 @@ function ResultPage(props) {
         </div>
         <hr className='m-0' />
         {loading ? (
-          <h1>Loading</h1>
+          <div class='container'>
+            <div class='row'>
+              <div class='col'>
+                <div
+                  class='d-flex justify-content-center align-items-center align-content-center'
+                  style={{ height: '16rem' }}
+                >
+                  <span
+                    class='spinner-grow text-danger'
+                    role='status'
+                    style={{ width: '4rem', height: '4rem' }}
+                  ></span>
+                </div>
+              </div>
+            </div>
+          </div>
         ) : (
           <div className='container'>
             <div className='row'>
