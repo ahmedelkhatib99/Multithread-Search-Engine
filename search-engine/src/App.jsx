@@ -6,7 +6,7 @@ function App() {
   return (
     <Router>
       <Switch>
-        <Route path='/search/:query' component={ResultPage}></Route>
+        <Route path='/search/:query/:page' component={ResultPage}></Route>
         <Route path='/' component={MainPage}></Route>
       </Switch>
     </Router>

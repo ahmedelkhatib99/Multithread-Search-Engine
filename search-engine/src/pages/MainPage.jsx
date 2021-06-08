@@ -55,10 +55,12 @@ function MainPage() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              history.push({
-                pathname: `/search/${query}`,
-              });
-              window.location.reload();
+              if (query.length > 0) {
+                history.push({
+                  pathname: `/search/${query}/1`,
+                });
+                window.location.reload();
+              }
             }}
           >
             <div className='d-flex flex-column justify-content-center vh-100'>

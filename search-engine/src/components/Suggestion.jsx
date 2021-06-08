@@ -11,7 +11,7 @@ function Suggestion(props) {
       onClick={(e) => {
         e.preventDefault();
         history.push({
-          pathname: `/search/${props.query}`,
+          pathname: `/search/${props.query}/1`,
         });
         window.location.reload();
       }}

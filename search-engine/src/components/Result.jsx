@@ -12,7 +12,6 @@ export class Result extends Component {
   }
 
   render() {
-    console.log(this.props);
     return (
       <div className='card shadow' style={{ marginBottom: '0.7rem' }}>
         <div className='card-header' style={{ padding: '0.4rem 1rem' }}>
