@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Result from '../components/Result';
 import Suggestion from '../components/Suggestion';
 import Pagination from '../components/Pagination';
@@ -20,8 +20,7 @@ function ResultPage(props) {
   const [pagesArray, setPageArray] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const pageCount = 20;
-  let queryLast;
+  const pageCount = 10;
 
   function GetSortOrder(prop) {
     return function (a, b) {

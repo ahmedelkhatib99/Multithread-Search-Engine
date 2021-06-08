@@ -16,7 +16,7 @@ public class SearchController {
     public SearchResult searchDB(@RequestParam("query") String query, @RequestParam(value = "page", required = true, defaultValue = "1") int page) throws FileNotFoundException {
         ArrayList<SearchResult.pageItem> resList = new ArrayList<SearchResult.pageItem>();
 
-        Document doc = QueryProcessor.getSearchResults(query,page,20);
+        Document doc = QueryProcessor.getSearchResults(query,page,10);
         ArrayList<Document> docList = (ArrayList<Document>) doc.get("list");
         String docCount = doc.get("count").toString();
 
