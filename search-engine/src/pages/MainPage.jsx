@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Axios from 'axios';
-import logo from '../assets/img/1280px-Node.js_logo.svg.png';
+import logo from '../assets/img/Asset 1.svg';
 import Suggestion from '../components/Suggestion';
 import { useHistory } from 'react-router-dom';
 
@@ -96,8 +96,9 @@ function MainPage() {
                 className='d-flex d-xl-flex justify-content-center justify-content-xl-center'
                 style={{ padding: '0.5rem' }}
               >
-                <button className='btn btn-light btn-lg' type='submit'>
-                  Search&nbsp;<i className='fas fa-arrow-circle-right'></i>
+                <button className='btn btn-danger btn-lg' type='submit'>
+                  <em>Search&nbsp;</em>
+                  <i className='fas fa-arrow-circle-right'></i>
                 </button>
               </div>
             </div>

@@ -2,7 +2,7 @@ import React, { Component, useEffect, useState } from 'react';
 import Result from '../components/Result';
 import Suggestion from '../components/Suggestion';
 import Pagination from '../components/Pagination';
-import logo from '../assets/img/1280px-Node.js_logo.svg.png';
+import logo from '../assets/img/Asset 1.svg';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 
@@ -100,7 +100,7 @@ function ResultPage(props) {
           >
             <div
               style={{
-                height: '8rem',
+                height: '7rem',
                 padding: '2rem 2rem',
                 cursor: 'pointer',
               }}
