@@ -205,7 +205,7 @@ public class QueryProcessor {
                 }
                 spaceCounter = 0;
                 int end = wordIndex;
-                while (end < (pageText.length() - 1) && spaceCounter < 10) {
+                while (end < (pageText.length() - 1) && spaceCounter < 40) {
                     end++;
                     if (pageText.charAt(end) == ' ') {
                         spaceCounter++;

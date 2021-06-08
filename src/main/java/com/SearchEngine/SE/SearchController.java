@@ -20,8 +20,10 @@ public class SearchController {
         ArrayList<Document> docList = (ArrayList<Document>) doc.get("list");
         String docCount = doc.get("count").toString();
 
-        for (Document docItem: docList){
-            resList.add(new SearchResult.pageItem(docItem.get("pageTitle").toString(), docItem.get("URL").toString(), docItem.get("pageText").toString()));
+        if (docList != null) {
+            for (Document docItem : docList) {
+                resList.add(new SearchResult.pageItem(docItem.get("pageTitle").toString(), docItem.get("URL").toString(), docItem.get("pageText").toString()));
+            }
         }
 
         SearchResult res = new SearchResult(resList, docCount);
