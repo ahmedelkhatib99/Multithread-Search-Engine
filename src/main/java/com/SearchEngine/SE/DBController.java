@@ -107,7 +107,20 @@ public class DBController {
         Document pageEntry = new Document("URL", URL);
         pageEntry.append("pageTitle", pageTitle);
         pageEntry.append("pageText", pageText);
+        pageEntry.append("indexState", "none");
         pages.insertOne(pageEntry);
+    }
+
+    // Get new non indexed page
+    public Document getNewUnindexedPage() {
+        Document newPage = pages.find(Filters.eq("indexState", "none")).first();
+        pages.findOneAndUpdate(Filters.eq("_id",newPage.get("_id")), Updates.set("indexState", "indexing"));
+        return newPage;
+    }
+
+    // Get new non indexed page
+    public void markDonePage(Document Page) {
+        pages.findOneAndUpdate(Filters.eq("_id",Page.get("_id")), Updates.set("indexState", "done"));
     }
 
     // Check if a page exists in pages

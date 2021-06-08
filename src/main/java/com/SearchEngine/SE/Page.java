@@ -15,16 +15,15 @@ public class Page {
     private String URL;
     private String Title;
     private String Text;
+    private String IndexState;
     private final ArrayList<String> hyperlinkList = new ArrayList<>();
 
     public Page(String URL, Boolean Extract, DBController DB, Counter linkCounter) {
         try {
-
-            this.URL = URL;
-
             // Fetch Document Data from the internet
             Document document = Jsoup.connect(URL).get();
 
+            this.URL = URL;
             setPageTitle(document);
             setPageText(document);
 
