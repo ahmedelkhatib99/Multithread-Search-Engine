@@ -9,11 +9,13 @@ function Suggestion(props) {
       className='d-flex justify-content-between align-items-center suggest-item'
       style={{ cursor: 'pointer' }}
       onClick={(e) => {
-        e.preventDefault();
-        history.push({
-          pathname: `/search/${props.query}/1`,
-        });
-        window.location.reload();
+        if (props.query.length > 0) {
+          e.preventDefault();
+          history.push({
+            pathname: `/search/${props.query}/1`,
+          });
+          window.location.reload();
+        }
       }}
     >
       <h5 style={{ margin: '0.25rem', fontSize: '1.2rem' }}>{props.query}</h5>

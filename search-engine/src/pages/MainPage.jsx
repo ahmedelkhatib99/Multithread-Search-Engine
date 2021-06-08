@@ -26,7 +26,6 @@ function MainPage() {
   }
 
   useEffect(() => {
-    console.log(query);
     setSuggestions([]);
     if (query && query.length >= 2) {
       Axios({
@@ -34,7 +33,7 @@ function MainPage() {
         url: `http://localhost:8080/api/suggest?query=${query}`,
       })
         .then((res) => {
-          console.log(res.data);
+          console.log(query);
           setSuggestions(res.data.sort(GetSortOrder('frequency')).slice(0, 9));
         })
         .catch((err) => {
@@ -43,9 +42,8 @@ function MainPage() {
     }
   }, [query]);
 
-  const _handleKeyDown = (e) => {
+  const handleChange = (e) => {
     setQuery(e.target.value);
-    console.log(e.target.value);
   };
 
   return (
@@ -83,12 +81,12 @@ function MainPage() {
                       borderWidth: 'thin',
                       borderColor: '#a7a7a7',
                     }}
-                    onKeyDown={_handleKeyDown}
+                    onChange={handleChange}
                   />
                   <i className='fa fa-search search-icn'></i>
                   <div className='suggest-list'>
                     {suggestions.map((suggest) => {
-                      console.log(suggest.searchQueryText);
+                      console.log(query);
                       return <Suggestion query={suggest.searchQueryText} />;
                     })}
                   </div>

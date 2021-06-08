@@ -1,7 +1,7 @@
 .search-bar {
   height: 3rem;
   font-size: 1.7rem;
-  padding: 0.25rem 0.25rem;
+  padding: 0.25rem 0.5rem;
   border: solid;
   border-width: thin;
   border-color: #a7a7a7;
@@ -22,7 +22,18 @@
   border: solid;
   border-width: 0px 1px 1px 1px;
   border-color: #cdcdcd;
-  padding: 0.2rem;
+  padding: 0 0.4rem 0 0.2rem;
+}
+
+.suggest-item:hover {
+  height: 2.3rem;
+  background-color: #ffffff;
+  border: solid;
+  border-width: 0px 1px 1px 1px;
+  border-color: #cdcdcd;
+  color: #1d0783;
+  padding: 0 0 0 0.2rem;
+  transition: all 0.2s;
 }
 
 .fa.fa-search.search-icn {

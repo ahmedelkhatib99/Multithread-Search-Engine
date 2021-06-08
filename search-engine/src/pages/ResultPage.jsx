@@ -67,13 +67,9 @@ function ResultPage(props) {
       );
     }
     setPageArray(pageArray);
-
-    console.log(pageArray);
-    console.log(pagesArray);
   };
 
-  const _handleKeyDown = (e) => {
-    setQuery(e.target.value);
+  useEffect(() => {
     setSuggestions([]);
     if (query && query.length >= 2) {
       axios({
@@ -81,13 +77,17 @@ function ResultPage(props) {
         url: `http://localhost:8080/api/suggest?query=${query}`,
       })
         .then((res) => {
-          console.log(res.data);
+          console.log(query);
           setSuggestions(res.data.sort(GetSortOrder('frequency')).slice(0, 9));
         })
         .catch((err) => {
           console.log(err);
         });
     }
+  }, [query]);
+
+  const handleChange = (e) => {
+    setQuery(e.target.value);
   };
 
   return (
@@ -109,7 +109,6 @@ function ResultPage(props) {
                 history.push({
                   pathname: `/`,
                 });
-                window.location.reload();
               }}
             >
               <img alt='logo' src={logo} style={{ height: '100%' }} />
@@ -124,10 +123,12 @@ function ResultPage(props) {
                   onSubmit={(e) => {
                     e.preventDefault();
                     setResults([]);
-                    history.push({
-                      pathname: `/search/${query}/1`,
-                    });
-                    window.location.reload();
+                    if (query.length > 0) {
+                      history.push({
+                        pathname: `/search/${query}/1`,
+                      });
+                      window.location.reload();
+                    }
                   }}
                 >
                   <input
@@ -135,7 +136,7 @@ function ResultPage(props) {
                     type='text'
                     style={{ width: '32rem' }}
                     value={query}
-                    onChange={_handleKeyDown}
+                    onChange={handleChange}
                   />
                 </form>
                 <i className='fa fa-search search-icn'></i>
